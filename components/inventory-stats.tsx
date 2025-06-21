@@ -1,115 +1,127 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Package, CheckCircle, XCircle, TrendingUp } from "lucide-react";
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const StatCard = ({
-  title,
-  value,
-  subtitle,
-  colorClass,
-  revenue,
-}: {
-  title: string;
-  value: string | number;
-  subtitle: string;
-  colorClass: string;
-  revenue?: string;
-}) => {
-  return (
-    <motion.div
-      className="p-6 bg-white rounded-lg shadow-lg"
-      variants={cardVariants}
-      whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-    >
-      <div className={`text-lg font-bold ${colorClass}`}>{title}</div>
-      <div className="mt-2 text-4xl font-bold text-slate-800">{value}</div>
-      <div className="mt-1 text-slate-500">{subtitle}</div>
-      {revenue && <div className="mt-1 text-slate-500">{revenue}</div>}
-    </motion.div>
-  );
-};
-
-const LowStockCard = ({
-  title,
-  ordered,
-  notInStock,
-  colorClass,
-}: {
-  title: string;
-  ordered: number;
-  notInStock: number;
-  colorClass: string;
-}) => {
-  return (
-    <motion.div
-      className="p-6 bg-white rounded-lg shadow-lg"
-      variants={cardVariants}
-      whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-    >
-      <div className={`text-lg font-bold ${colorClass}`}>{title}</div>
-      <div className="flex justify-between mt-2">
-        <div>
-          <div className="text-4xl font-bold text-slate-800">{ordered}</div>
-          <div className="mt-1 text-slate-500">Ordered</div>
-        </div>
-        <div>
-          <div className="text-4xl font-bold text-slate-800">{notInStock}</div>
-          <div className="mt-1 text-slate-500">Not in stock</div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+interface Product {
+  _id: string;
+  department: string;
+  status: "functional" | "non-functional";
+  createdAt: string;
+}
 
 const InventoryStats = () => {
+  const [stats, setStats] = useState({
+    total: 0,
+    functional: 0,
+    nonFunctional: 0,
+    departments: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const response = await fetch("http://localhost:5000/api/products", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const products: Product[] = data.products;
+
+          const total = products.length;
+          const functional = products.filter(
+            (p) => p.status === "functional"
+          ).length;
+          const nonFunctional = products.filter(
+            (p) => p.status === "non-functional"
+          ).length;
+          const departments = new Set(products.map((p) => p.department)).size;
+
+          setStats({ total, functional, nonFunctional, departments });
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const statCards = [
+    {
+      title: "Total Items",
+      value: stats.total,
+      icon: Package,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+    },
+    {
+      title: "Functional",
+      value: stats.functional,
+      icon: CheckCircle,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+    },
+    {
+      title: "Non-Functional",
+      value: stats.nonFunctional,
+      icon: XCircle,
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+    },
+    {
+      title: "Departments",
+      value: stats.departments,
+      icon: TrendingUp,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="p-6 bg-white rounded-lg shadow-lg animate-pulse"
+          >
+            <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
+            <div className="h-8 bg-slate-200 rounded w-1/2"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h2 className="mb-6 text-2xl font-bold text-slate-800">
-        Overall Inventory
-      </h2>
-      <motion.div
-        className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          visible: {
-            transition: {
-              staggerChildren: 0.1,
-            },
-          },
-        }}
-      >
-        <StatCard
-          title="Categories"
-          value={14}
-          subtitle="Last 7 days"
-          colorClass="text-emerald-500"
-        />
-        <StatCard
-          title="Total Products"
-          value={868}
-          subtitle="Last 7 days"
-          colorClass="text-emerald-500"
-          revenue="₹25000 Revenue"
-        />
-        <StatCard
-          title="Top Selling"
-          value={5}
-          subtitle="Last 7 days"
-          colorClass="text-emerald-500"
-          revenue="₹2500 Cost"
-        />
-        <LowStockCard
-          title="Low Stocks"
-          ordered={12}
-          notInStock={2}
-          colorClass="text-red-500"
-        />
-      </motion.div>
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {statCards.map((stat, index) => (
+        <motion.div
+          key={stat.title}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="p-6 bg-white rounded-lg shadow-lg"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-600">{stat.title}</p>
+              <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
+            </div>
+            <div className={`p-3 rounded-full ${stat.bgColor}`}>
+              <stat.icon className={`w-6 h-6 ${stat.color}`} />
+            </div>
+          </div>
+        </motion.div>
+      ))}
     </div>
   );
 };

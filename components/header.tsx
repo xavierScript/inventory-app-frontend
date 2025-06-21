@@ -2,9 +2,28 @@
 
 import { Search, Bell } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
+  const [user, setUser] = useState<{ username: string } | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        setUser(JSON.parse(userStr));
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/login");
+  };
+
   return (
     <header className="flex items-center justify-between h-20 px-8 bg-white border-b">
       <div className="flex items-center">
@@ -34,6 +53,17 @@ const Header = () => {
             <div className="text-sm text-slate-500">Administrator</div>
           </div>
         </div>
+        {user && (
+          <div className="flex items-center gap-4">
+            <span className="text-slate-700">{user.username}</span>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
