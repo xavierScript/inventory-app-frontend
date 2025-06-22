@@ -45,11 +45,14 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/products", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://inventory-app-backend-8i8b.onrender.com/api/products",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch products");
@@ -118,12 +121,15 @@ const Dashboard = () => {
   const handleDeleteProduct = async (id: string) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `https://inventory-app-backend-8i8b.onrender.com/api/products/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete product");

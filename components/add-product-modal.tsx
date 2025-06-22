@@ -117,7 +117,7 @@ const AddProductModal = ({
       if (productToEdit) {
         // Update product
         const response = await fetch(
-          `http://localhost:5000/api/products/${productToEdit._id}`,
+          `https://inventory-app-backend-8i8b.onrender.com/api/products/${productToEdit._id}`,
           {
             method: "PUT",
             headers: {
@@ -137,14 +137,17 @@ const AddProductModal = ({
         onUpdateProduct(updatedProduct.product);
       } else {
         // Add new product
-        const response = await fetch("http://localhost:5000/api/products", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(productData),
-        });
+        const response = await fetch(
+          "https://inventory-app-backend-8i8b.onrender.com/api/products",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(productData),
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
