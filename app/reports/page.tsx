@@ -216,11 +216,11 @@ const ReportsPage = () => {
 
     // Set font styles
     doc.setFontSize(20);
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     doc.text("INVENTORY SUMMARY REPORT", 20, 30);
 
     doc.setFontSize(12);
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 45);
     doc.text(
       `Filters: Department=${selectedDepartment}, Status=${statusFilter}, Date Range=${dateRange} days`,
@@ -230,11 +230,11 @@ const ReportsPage = () => {
 
     // Summary section
     doc.setFontSize(16);
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     doc.text("SUMMARY", 20, 75);
 
     doc.setFontSize(12);
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     doc.text(`Total Items: ${totalItems}`, 20, 90);
     doc.text(
       `Functional: ${functionalItems} (${functionalPercentage}%)`,
@@ -251,11 +251,11 @@ const ReportsPage = () => {
 
     // Department breakdown
     doc.setFontSize(16);
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     doc.text("DEPARTMENT BREAKDOWN", 20, 130);
 
     doc.setFontSize(12);
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     let yPos = 145;
     departmentData.forEach((dept) => {
       if (yPos > 250) {
@@ -272,11 +272,11 @@ const ReportsPage = () => {
 
     // Top models
     doc.setFontSize(16);
-    doc.setFont(undefined, "bold");
+    doc.setFont("helvetica", "bold");
     doc.text("TOP EQUIPMENT MODELS", 20, yPos + 10);
 
     doc.setFontSize(12);
-    doc.setFont(undefined, "normal");
+    doc.setFont("helvetica", "normal");
     yPos += 25;
     getTopModels().forEach((model, index) => {
       if (yPos > 250) {
